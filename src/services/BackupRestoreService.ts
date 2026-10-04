@@ -7,7 +7,7 @@ import { Task, Category, Habit, AppSettings, TaskHistoryItem } from '../types';
 
 export interface SmartDayBackup {
   version: string;
-  app: 'SmartDay';
+  app: 'Donezy' | 'SmartDay';
   exportedAt: string;
   tasks: Task[];
   categories: Category[];
@@ -28,7 +28,7 @@ export class BackupRestoreService {
 
     const backup: SmartDayBackup = {
       version: '1.0.0',
-      app: 'SmartDay',
+      app: 'Donezy',
       exportedAt: new Date().toISOString(),
       tasks,
       categories,
@@ -46,7 +46,7 @@ export class BackupRestoreService {
     const a = document.createElement('a');
     const dateStamp = new Date().toISOString().split('T')[0];
     a.href = url;
-    a.download = `smartday-backup-${dateStamp}.json`;
+    a.download = `donezy-backup-${dateStamp}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

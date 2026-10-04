@@ -444,7 +444,7 @@ export const SettingsView: React.FC = () => {
             100% Local-First & Private
           </h4>
           <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-            SmartDay stores all tasks, categories, and settings strictly in your browser's IndexedDB. No task data is uploaded to remote servers or third-party AI models. The app is fully functional offline.
+            Donezy stores all tasks, categories, and settings strictly in your browser's IndexedDB. No task data is uploaded to remote servers or third-party AI models. The app is fully functional offline.
           </p>
         </div>
       </div>
@@ -454,7 +454,7 @@ export const SettingsView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-left animate-scale-in">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-              Import SmartDay Backup
+              Import Donezy Backup
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
               Found {importPendingBackup.tasks?.length || 0} tasks and {importPendingBackup.categories?.length || 0} categories. Choose how you want to restore:

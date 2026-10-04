@@ -7,13 +7,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'smartday-icon.svg'],
+      includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'donezy-icon.svg', 'smartday-icon.svg'],
       manifest: {
-        name: 'SmartDay — Smart Todo & Reminders',
-        short_name: 'SmartDay',
-        description: 'Capture tasks in seconds with natural language, voice input, and smart reminders.',
+        name: 'Donezy — Smart Todo & Reminders',
+        short_name: 'Donezy',
+        description: 'Lightning-fast smart todo and reminder PWA with natural language, voice input, and offline support.',
         theme_color: '#6366f1',
-        background_color: '#f8fafc',
+        background_color: '#0f172a',
         display: 'standalone',
         orientation: 'any',
         start_url: '/',
@@ -22,18 +22,20 @@ export default defineConfig({
           {
             src: '/pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ],
         shortcuts: [

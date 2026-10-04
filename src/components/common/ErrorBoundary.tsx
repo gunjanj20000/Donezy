@@ -68,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Something went wrong
             </h1>
             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-              SmartDay encountered an unexpected issue while loading. Don't worry, your tasks are safe in local storage.
+              Donezy encountered an unexpected issue while loading. Don't worry, your tasks are safe in local storage.
             </p>
 
             {this.state.error && (

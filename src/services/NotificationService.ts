@@ -131,9 +131,9 @@ export class NotificationService {
     if (this.isNotificationSupported() && Notification.permission === 'granted') {
       try {
         const notif = new Notification(`⏰ ${task.title}`, {
-          body: task.notes || 'SmartDay reminder for your task',
-          icon: '/smartday-icon.svg',
-          badge: '/smartday-icon.svg',
+          body: task.notes || 'Donezy reminder for your task',
+          icon: '/donezy-icon.svg',
+          badge: '/donezy-icon.svg',
           tag: `task-${task.id}`,
         });
 

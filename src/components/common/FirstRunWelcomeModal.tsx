@@ -28,15 +28,17 @@ export const FirstRunWelcomeModal: React.FC = () => {
         className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 text-center flex flex-col items-center animate-scale-in"
         role="dialog"
         aria-modal="true"
-        aria-label="Welcome to SmartDay"
+        aria-label="Welcome to Donezy"
       >
         {/* App Logo */}
-        <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-brand-600 to-pink-500 flex items-center justify-center text-white mb-4 shadow-xl shadow-brand-500/30">
-          <Sparkles className="w-8 h-8" />
-        </div>
+        <img
+          src="/donezy-icon.svg"
+          alt="Donezy"
+          className="w-16 h-16 rounded-3xl mb-4 shadow-xl shadow-brand-500/30"
+        />
 
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
-          Welcome to SmartDay 👋
+          Welcome to Donezy 👋
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-xs">
           Organize your day with less typing. Capture tasks in seconds using voice, natural language, or one-tap presets.

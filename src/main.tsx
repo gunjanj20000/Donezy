@@ -7,12 +7,12 @@ import { registerSW } from 'virtual:pwa-register';
 // Register service worker for offline functionality
 const updateSW = registerSW({
   onNeedRefresh() {
-    if (confirm('A new version of SmartDay is available. Reload to update?')) {
+    if (confirm('A new version of Donezy is available. Reload to update?')) {
       updateSW(true);
     }
   },
   onOfflineReady() {
-    console.log('SmartDay is ready to work completely offline.');
+    console.log('Donezy is ready to work completely offline.');
   },
 });
 
