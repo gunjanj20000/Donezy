@@ -196,7 +196,7 @@ export function getSmartTimePresets() {
     {
       id: 'weekend',
       label: 'This Weekend',
-      description: format(weekendDate, 'EEE, 10:00 AM'),
+      description: `${format(weekendDate, 'EEE')}, 10:00 AM`,
       date: format(weekendDate, 'yyyy-MM-dd'),
       time: '10:00',
       icon: 'Coffee'
@@ -204,7 +204,7 @@ export function getSmartTimePresets() {
     {
       id: 'next_week',
       label: 'Next Week',
-      description: format(nextWeekDate, 'MMM d, 9:00 AM'),
+      description: `${format(nextWeekDate, 'MMM d')}, 9:00 AM`,
       date: format(nextWeekDate, 'yyyy-MM-dd'),
       time: '09:00',
       icon: 'Briefcase'

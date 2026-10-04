@@ -3,6 +3,8 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AppShell } from './components/layout/AppShell';
 import { Sparkles } from 'lucide-react';
 
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+
 const MainContent: React.FC = () => {
   const { loading } = useApp();
 
@@ -24,8 +26,10 @@ const MainContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainContent />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <MainContent />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

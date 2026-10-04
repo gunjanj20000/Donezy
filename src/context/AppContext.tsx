@@ -14,6 +14,7 @@ import { HabitRepository } from '../repositories/HabitRepository';
 import { SettingsRepository } from '../repositories/SettingsRepository';
 import { HistoryRepository } from '../repositories/HistoryRepository';
 import { sounds, NotificationService } from '../services/NotificationService';
+import { DEFAULT_SETTINGS } from '../db/indexedDB';
 import { getNextOccurrenceDate } from '../utils/recurrence';
 import { format, isToday, parseISO } from 'date-fns';
 
@@ -73,7 +74,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [settings, setSettings] = useState<AppSettings>(SettingsRepository.getSettings as unknown as AppSettings);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
 
   const [selectedTab, setSelectedTab] = useState<ViewTab>('today');
