@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'vibrant',
   darkMode: false,
   soundEnabled: true,
+  reminderTone: 'chime',
   vibrationEnabled: true,
   celebrationConfetti: true,
   defaultReminderOffset: 0,

@@ -66,10 +66,13 @@ export interface Habit {
 
 export type ThemeType = 'vibrant' | 'ocean' | 'sunset' | 'forest' | 'lavender' | 'minimal' | 'dark';
 
+export type ReminderTone = 'chime' | 'bell' | 'marimba' | 'cosmic' | 'digital' | 'zen';
+
 export interface AppSettings {
   theme: ThemeType;
   darkMode: boolean;
   soundEnabled: boolean;
+  reminderTone?: ReminderTone;
   vibrationEnabled: boolean;
   celebrationConfetti: boolean;
   defaultReminderOffset: number; // minutes before due

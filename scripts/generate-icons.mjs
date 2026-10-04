@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import path from 'path';
 
 // Master Donezy SVG Icon Design
@@ -178,3 +178,54 @@ fs.writeFileSync('public/smartday-icon.svg', donezySvg);
 fs.writeFileSync('public/donezy-maskable.svg', donezyMaskableSvg);
 
 console.log('SVG icons written successfully.');
+
+function renderSvgToPng(svgContent, targetPath, size, isOpaque = false) {
+  const tmpHtml = path.join('/tmp', `render_${path.basename(targetPath)}_${Date.now()}.html`);
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background: ${isOpaque ? '#4F46E5' : 'transparent'};
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+</head>
+<body>
+${svgContent}
+</body>
+</html>`;
+
+  fs.writeFileSync(tmpHtml, html);
+  const bgFlag = isOpaque ? '' : '--default-background-color=00000000';
+  execSync(
+    `google-chrome --headless --no-sandbox --disable-gpu --force-device-scale-factor=1 --hide-scrollbars ${bgFlag} --window-size=${size},${size} --screenshot=${targetPath} file://${tmpHtml}`,
+    { stdio: 'ignore' }
+  );
+  try {
+    fs.unlinkSync(tmpHtml);
+  } catch {}
+  console.log(`Rendered: ${targetPath} (${size}x${size})`);
+}
+
+// Generate all PNG icons
+renderSvgToPng(donezyMaskableSvg, 'public/apple-touch-icon.png', 180, true);
+renderSvgToPng(donezySvg, 'public/pwa-192x192.png', 192, false);
+renderSvgToPng(donezySvg, 'public/pwa-512x512.png', 512, false);
+renderSvgToPng(donezyMaskableSvg, 'public/pwa-maskable-512x512.png', 512, true);
+renderSvgToPng(donezySvg, 'public/favicon.png', 64, false);
+
+// Also copy favicon to favicon.ico for older browser fallbacks
+fs.copyFileSync('public/favicon.png', 'public/favicon.ico');
+console.log('All PNG & SVG icons generated successfully without scrollbars or clipping.');

@@ -54,7 +54,7 @@ export const RemindersView: React.FC = () => {
   const handleRequestPermission = async () => {
     const granted = await NotificationService.requestPermission();
     if (granted) {
-      sounds.playCompletionChime();
+      sounds.playReminderTone(settings.reminderTone || 'chime');
     }
   };
 

@@ -17,10 +17,14 @@ import {
   Check, 
   AlertTriangle,
   Moon,
-  Sun
+  Sun,
+  Play,
+  RefreshCw,
+  Smartphone,
+  Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ThemeType, Category } from '../../types';
+import { ThemeType, Category, ReminderTone } from '../../types';
 import { sounds, NotificationService } from '../../services/NotificationService';
 import { BackupRestoreService, SmartDayBackup } from '../../services/BackupRestoreService';
 import { IconRenderer } from '../common/IconRenderer';
@@ -32,6 +36,15 @@ const THEMES: { id: ThemeType; name: string; colors: string[] }[] = [
   { id: 'forest', name: 'Forest', colors: ['#059669', '#10b981'] },
   { id: 'lavender', name: 'Lavender', colors: ['#8b5cf6', '#d946ef'] },
   { id: 'minimal', name: 'Minimal', colors: ['#334155', '#94a3b8'] },
+];
+
+const REMINDER_TONES: { id: ReminderTone; name: string; desc: string; icon: string }[] = [
+  { id: 'chime', name: 'Classic Chime', desc: 'Soft dual-tone melodic bell', icon: '🔔' },
+  { id: 'bell', name: 'Resonant Bell', desc: 'Harmonic crystal brass chime', icon: '✨' },
+  { id: 'marimba', name: 'Warm Marimba', desc: 'Acoustic wooden tri-tone', icon: '🪵' },
+  { id: 'cosmic', name: 'Cosmic Sweep', desc: 'Futuristic synth glow sweep', icon: '🪐' },
+  { id: 'digital', name: 'Digital Watch', desc: 'Crisp modern dual-pulse beep', icon: '⌚' },
+  { id: 'zen', name: 'Zen Bowl', desc: 'Harmonic 432Hz meditation gong', icon: '🧘' },
 ];
 
 export const SettingsView: React.FC = () => {
@@ -47,6 +60,101 @@ export const SettingsView: React.FC = () => {
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [importPendingBackup, setImportPendingBackup] = useState<SmartDayBackup | null>(null);
   const [showImportModal, setShowImportModal] = useState(false);
+
+  // App Update State
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateStatusMessage, setUpdateStatusMessage] = useState<string | null>(null);
+  const [updateStatusType, setUpdateStatusType] = useState<'info' | 'success' | 'update'>('info');
+
+  // Notification Permission State
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>(() => 
+    NotificationService.getPermissionStatus()
+  );
+
+  React.useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg?.waiting) {
+          setUpdateAvailable(true);
+          setUpdateStatusMessage('New version downloaded and ready to apply!');
+          setUpdateStatusType('update');
+        }
+        reg?.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker?.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              setUpdateAvailable(true);
+              setUpdateStatusMessage('New version available! Tap Update App to install.');
+              setUpdateStatusType('update');
+            }
+          });
+        });
+      });
+    }
+  }, []);
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    setUpdateStatusMessage('Checking for app updates...');
+    setUpdateStatusType('info');
+
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) {
+          await reg.update();
+          if (reg.waiting || reg.installing) {
+            setUpdateAvailable(true);
+            setUpdateStatusMessage('New update found! Installing...');
+            setUpdateStatusType('update');
+            if (reg.waiting) {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+            return;
+          }
+        }
+      }
+
+      const res = await fetch(`/?_chk=${Date.now()}`, { cache: 'no-store', method: 'HEAD' });
+      if (res.ok) {
+        setUpdateStatusMessage('Donezy is up to date with the latest version!');
+        setUpdateStatusType('success');
+      } else {
+        setUpdateStatusMessage('Running latest cached version.');
+        setUpdateStatusType('info');
+      }
+    } catch {
+      setUpdateStatusMessage('Operating in offline mode. Local cache active.');
+      setUpdateStatusType('info');
+    } finally {
+      setIsCheckingUpdate(false);
+      setTimeout(() => {
+        setUpdateStatusMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleForceRefresh = async () => {
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch {}
+    window.location.reload();
+  };
+
+  const handleRequestNotification = async () => {
+    const granted = await NotificationService.requestPermission();
+    setPermissionStatus(granted ? 'granted' : 'denied');
+    if (granted) {
+      sounds.playReminderTone(settings.reminderTone || 'chime');
+    }
+  };
 
   // New Category State
   const [newCatName, setNewCatName] = useState('');
@@ -273,6 +381,197 @@ export const SettingsView: React.FC = () => {
               className="w-5 h-5 rounded text-brand-600"
             />
           </div>
+        </div>
+      </div>
+
+      {/* REMINDER TONES */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Reminder Tones
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Choose the audio chime for your scheduled alarms and notifications.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+          {REMINDER_TONES.map(tone => {
+            const isSelected = (settings.reminderTone || 'chime') === tone.id;
+            return (
+              <div
+                key={tone.id}
+                onClick={() => {
+                  updateSettings({ reminderTone: tone.id });
+                  sounds.playReminderTone(tone.id);
+                }}
+                className={`p-3.5 rounded-2xl border text-left flex items-center justify-between cursor-pointer transition-all ${
+                  isSelected
+                    ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 ring-2 ring-brand-500/20'
+                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-850'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-lg">{tone.icon}</span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      {tone.name}
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                      {tone.desc}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sounds.playReminderTone(tone.id);
+                    }}
+                    className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-brand-600 dark:text-brand-400 flex items-center justify-center transition-transform active:scale-90"
+                    title={`Preview ${tone.name}`}
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                  </button>
+
+                  {isSelected && (
+                    <div className="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* PUSH NOTIFICATIONS & BACKGROUND ALERTS */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Smartphone className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Background & System Notifications
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Receive lock screen alert banners when reminder times arrive
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+              permissionStatus === 'granted'
+                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                : permissionStatus === 'denied'
+                  ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                  : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+            }`}>
+              {permissionStatus === 'granted' ? 'Allowed' : permissionStatus === 'denied' ? 'Blocked' : 'Action Needed'}
+            </span>
+
+            {permissionStatus !== 'granted' && (
+              <button
+                type="button"
+                onClick={handleRequestNotification}
+                className="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition-all active:scale-95 shadow-sm"
+              >
+                Enable
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 flex items-start gap-2.5 text-xs text-slate-500 dark:text-slate-400">
+          <Info className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
+          <p className="leading-relaxed">
+            <strong className="text-slate-700 dark:text-slate-200">iOS & Android Tip:</strong> On iPhone/iPad (iOS 16.4+), tap Safari's <span className="font-semibold text-slate-800 dark:text-slate-200">Share → Add to Home Screen</span> to enable system lock screen banners and vibrations even when Donezy is in the background.
+          </p>
+        </div>
+      </div>
+
+      {/* APP VERSION & UPDATES (With small update button) */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-brand-500/20">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Donezy App Updates
+                </h3>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  v1.2.0
+                </span>
+                {updateAvailable && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 animate-pulse">
+                    New Update Available
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Check for latest features, fixes, and offline performance enhancements.
+              </p>
+            </div>
+          </div>
+
+          {/* Small Update Button */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCheckUpdate}
+              disabled={isCheckingUpdate}
+              className={`min-h-[38px] px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all disabled:opacity-50 ${
+                updateAvailable
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-amber-500/25 ring-2 ring-amber-400/50'
+                  : 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-500/20'
+              }`}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+              <span>
+                {isCheckingUpdate 
+                  ? 'Checking...' 
+                  : updateAvailable 
+                    ? 'Update App' 
+                    : 'Check for Updates'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Update Status Feedback */}
+        {updateStatusMessage && (
+          <div className={`p-3 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-fade-in ${
+            updateStatusType === 'success' 
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+              : updateStatusType === 'update'
+                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+          }`}>
+            {updateStatusType === 'success' && <Check className="w-4 h-4 text-emerald-500" />}
+            {updateStatusType === 'update' && <Sparkles className="w-4 h-4 text-amber-500" />}
+            <span>{updateStatusMessage}</span>
+          </div>
+        )}
+
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+          <span>PWA Service Worker: Offline Cache Active</span>
+          <button
+            onClick={handleForceRefresh}
+            className="text-brand-600 dark:text-brand-400 hover:underline font-semibold"
+          >
+            Force Clear Cache & Reload
+          </button>
         </div>
       </div>
 

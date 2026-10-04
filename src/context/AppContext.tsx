@@ -443,9 +443,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSettings(updated);
   }, []);
 
-  // Background Reminder Ticker (checks every 15s)
+  // Background Reminder Ticker & App Wakeup Checker
   useEffect(() => {
-    const interval = setInterval(() => {
+    const triggerAlarm = (task: Task, wasSnoozed: boolean) => {
+      if (settings.soundEnabled) {
+        sounds.playReminderTone(settings.reminderTone || 'chime');
+      }
+      if (settings.vibrationEnabled) {
+        NotificationService.vibrate([200, 100, 200, 100, 400]);
+      }
+      NotificationService.sendNotification(task);
+      setActiveReminderTask(task);
+
+      // Record last notified and clear snoozedUntil if snoozed alarm fired
+      const updated: Task = {
+        ...task,
+        reminder: {
+          ...task.reminder!,
+          lastNotified: new Date().toISOString(),
+          snoozedUntil: wasSnoozed ? undefined : task.reminder?.snoozedUntil,
+        }
+      };
+      TaskRepository.save(updated);
+      setTasks(prev => prev.map(t => (t.id === task.id ? updated : t)));
+    };
+
+    const checkReminders = () => {
       const now = new Date();
       const todayStr = format(now, 'yyyy-MM-dd');
       const currentHhMm = format(now, 'HH:mm');
@@ -474,32 +497,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
       });
-    }, 15000);
-
-    const triggerAlarm = (task: Task, wasSnoozed: boolean) => {
-      if (settings.soundEnabled) {
-        sounds.playReminderChime();
-      }
-      if (settings.vibrationEnabled) {
-        NotificationService.vibrate([200, 100, 200, 100, 400]);
-      }
-      NotificationService.sendNotification(task);
-      setActiveReminderTask(task);
-
-      // Record last notified and clear snoozedUntil if snoozed alarm fired
-      const updated: Task = {
-        ...task,
-        reminder: {
-          ...task.reminder!,
-          lastNotified: new Date().toISOString(),
-          snoozedUntil: wasSnoozed ? undefined : task.reminder?.snoozedUntil,
-        }
-      };
-      TaskRepository.save(updated);
-      setTasks(prev => prev.map(t => (t.id === task.id ? updated : t)));
     };
 
-    return () => clearInterval(interval);
+    // Check immediately when app opens or tasks update
+    checkReminders();
+
+    // Check on interval
+    const interval = setInterval(checkReminders, 10000);
+
+    // Also check immediately when user switches back to the app / opens screen
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        checkReminders();
+      }
+    };
+    window.addEventListener('focus', checkReminders);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', checkReminders);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [tasks, settings]);
 
   const value = useMemo(() => ({
