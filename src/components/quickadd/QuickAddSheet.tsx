@@ -266,7 +266,7 @@ export const QuickAddSheet: React.FC = () => {
                 type="button"
                 onClick={() => setIsVoiceOpen(true)}
                 title="Voice Input"
-                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 text-white hover:from-brand-600 hover:to-indigo-700 shadow-md shadow-brand-500/20 active:scale-95 transition-all mr-0.5"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-500 to-accent-500 text-white hover:from-brand-600 hover:to-accent-600 shadow-md shadow-brand-500/20 active:scale-95 transition-all mr-0.5"
               >
                 <Mic className="w-5 h-5" />
               </button>
@@ -566,7 +566,7 @@ export const QuickAddSheet: React.FC = () => {
               <button
                 type="submit"
                 disabled={!input.trim()}
-                className="min-h-[48px] px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-sm flex items-center gap-2 shadow-lg shadow-brand-500/25 disabled:opacity-40 transition-all active:scale-95"
+                className="min-h-[48px] px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-semibold text-sm flex items-center gap-2 shadow-lg shadow-brand-500/25 disabled:opacity-40 transition-all active:scale-95"
               >
                 <span>Create Task</span>
                 <Send className="w-4 h-4" />

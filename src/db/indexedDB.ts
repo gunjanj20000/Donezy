@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { Task, Category, Habit, AppSettings, TaskHistoryItem } from '../types';
+import { Task, Category, Habit, AppSettings, TaskHistoryItem, ThemeType } from '../types';
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'personal', name: 'Personal', icon: 'User', color: '#6366f1', isDefault: true },
@@ -14,9 +14,32 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'other', name: 'Other', icon: 'Tag', color: '#64748b', isDefault: true },
 ];
 
+const getInitialTheme = (): ThemeType => {
+  try {
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('donezy_theme') : null;
+    if (saved && ['vibrant', 'ocean', 'sunset', 'forest', 'lavender', 'minimal', 'dark'].includes(saved)) {
+      return saved as ThemeType;
+    }
+  } catch {}
+  return 'vibrant';
+};
+
+const getInitialDarkMode = (): boolean => {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('donezy_dark');
+      if (saved !== null) return saved === 'true';
+    }
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+  } catch {}
+  return false;
+};
+
 export const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'vibrant',
-  darkMode: false,
+  theme: getInitialTheme(),
+  darkMode: getInitialDarkMode(),
   soundEnabled: true,
   reminderTone: 'chime',
   mainPageView: 'both',

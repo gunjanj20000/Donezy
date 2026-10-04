@@ -191,7 +191,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
             aria-label={isListening ? 'Stop listening' : 'Start listening'}
             className={`relative z-10 w-22 h-22 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl ${
               isListening
-                ? 'bg-gradient-to-tr from-brand-600 via-indigo-600 to-rose-500 text-white scale-105 shadow-brand-500/40 ring-8 ring-brand-100 dark:ring-brand-950'
+                ? 'bg-gradient-to-tr from-brand-600 via-brand-500 to-accent-500 text-white scale-105 shadow-brand-500/40 ring-8 ring-brand-100 dark:ring-brand-950'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
@@ -280,7 +280,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
 
         {/* Structured Confirmation Preview */}
         {parsedResult && parsedResult.cleanTitle && (
-          <div className="w-full bg-gradient-to-br from-brand-50/70 to-indigo-50/50 dark:from-slate-800 dark:to-slate-800/70 border border-brand-200/60 dark:border-brand-900/40 rounded-2xl p-4 mb-5 text-left animate-slide-up">
+          <div className="w-full bg-gradient-to-br from-brand-50/70 to-accent-50/50 dark:from-slate-800 dark:to-slate-800/70 border border-brand-200/60 dark:border-brand-900/40 rounded-2xl p-4 mb-5 text-left animate-slide-up">
             <div className="text-[11px] uppercase tracking-wider font-bold text-brand-600 dark:text-brand-400 mb-1.5 flex items-center justify-between">
               <span>Task Preview</span>
               <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Ready to save ✓</span>
@@ -343,7 +343,7 @@ export const VoiceInputModal: React.FC<VoiceInputModalProps> = ({
                 onClose();
               }
             }}
-            className="min-h-[48px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 via-indigo-600 to-pink-500 hover:opacity-95 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 disabled:opacity-40 transition-all active:scale-95"
+            className="min-h-[48px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 hover:opacity-95 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 disabled:opacity-40 transition-all active:scale-95"
           >
             <Check className="w-4 h-4" />
             Create Task

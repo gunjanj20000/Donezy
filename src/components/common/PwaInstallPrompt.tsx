@@ -93,7 +93,7 @@ export const PwaInstallPrompt: React.FC = () => {
         {!isIos && deferredPrompt && (
           <button
             onClick={handleInstall}
-            className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-xs shrink-0 shadow-sm flex items-center gap-1.5 active:scale-95 transition-all"
+            className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-bold text-xs shrink-0 shadow-sm flex items-center gap-1.5 active:scale-95 transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             Install

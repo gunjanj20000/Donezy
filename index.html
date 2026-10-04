@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
     <title>Donezy — Smart Todo & Reminder PWA</title>
     <meta name="description" content="Donezy — Premium Smart To-Do List and Reminders with voice, natural language, and instant touch-friendly organization." />
+    <!-- Early theme and dark mode initialization -->
+    <script>
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('donezy_theme') || 'vibrant';
+          var isDark = localStorage.getItem('donezy_dark') === 'true' || 
+                       (!('donezy_dark' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     
     <!-- PWA meta tags -->
     <meta name="theme-color" content="#6366f1" />

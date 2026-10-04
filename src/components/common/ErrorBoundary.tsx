@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={this.handleReload}
-                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-brand-500 text-white font-semibold flex items-center justify-center gap-2 hover:opacity-95 active:scale-95 transition-all shadow-lg shadow-indigo-500/25 min-h-[44px]"
+                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-accent-500 text-white font-semibold flex items-center justify-center gap-2 hover:opacity-95 active:scale-95 transition-all shadow-lg shadow-brand-500/25 min-h-[44px]"
               >
                 <RefreshCw className="w-4 h-4" />
                 Reload App

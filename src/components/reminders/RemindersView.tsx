@@ -98,7 +98,7 @@ export const RemindersView: React.FC = () => {
 
       {/* Browser Notification Permission Banner */}
       {permission !== 'granted' && (
-        <div className="p-4 rounded-3xl bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 border border-brand-200/70 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+        <div className="p-4 rounded-3xl bg-gradient-to-r from-brand-50 to-accent-50 dark:from-slate-800 dark:to-slate-800 border border-brand-200/70 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
               <Bell className="w-5 h-5" />

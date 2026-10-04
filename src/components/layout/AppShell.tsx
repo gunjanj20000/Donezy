@@ -127,7 +127,7 @@ export const AppShell: React.FC = () => {
             className="w-8 h-8 rounded-xl shadow-md shadow-brand-500/20"
           />
           <div>
-            <h1 className="text-base font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-base font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-accent-500 bg-clip-text text-transparent">
               Donezy
             </h1>
           </div>
@@ -191,7 +191,7 @@ export const AppShell: React.FC = () => {
               className="w-10 h-10 rounded-2xl shadow-lg shadow-brand-500/25"
             />
             <div>
-              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent block">
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-accent-500 bg-clip-text text-transparent block">
                 Donezy
               </span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -203,7 +203,7 @@ export const AppShell: React.FC = () => {
           {/* Quick Add Button */}
           <button
             onClick={() => openQuickAdd()}
-            className="w-full min-h-[48px] mb-6 px-4 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 active:scale-95 transition-all"
+            className="w-full min-h-[48px] mb-6 px-4 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 active:scale-95 transition-all"
           >
             <Plus className="w-5 h-5 stroke-[2.5]" />
             <span>New Task</span>
@@ -277,7 +277,7 @@ export const AppShell: React.FC = () => {
         {/* DESKTOP RIGHT-SIDE PANEL (Widget area) */}
         <aside className="hidden xl:block w-64 2xl:w-72 shrink-0 border-l border-slate-200/80 dark:border-slate-800 p-5 2xl:p-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] space-y-6 sticky top-0 h-screen overflow-y-auto">
           {/* Today's Progress Card */}
-          <div className="bg-gradient-to-br from-brand-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-brand-500/20">
+          <div className="bg-gradient-to-br from-brand-600 to-brand-800 text-white rounded-3xl p-5 shadow-lg shadow-brand-500/20">
             <span className="text-[11px] font-bold uppercase tracking-wider text-brand-200 block mb-1">
               Today's Progress
             </span>
@@ -392,7 +392,7 @@ export const AppShell: React.FC = () => {
           <button
             onClick={() => openQuickAdd()}
             aria-label="Add task"
-            className="w-14 h-14 rounded-full bg-gradient-to-tr from-brand-600 via-indigo-600 to-pink-500 text-white flex items-center justify-center shadow-xl shadow-brand-500/35 active:scale-90 transition-transform ring-4 ring-white dark:ring-slate-900"
+            className="w-14 h-14 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-accent-500 text-white flex items-center justify-center shadow-xl shadow-brand-500/35 active:scale-90 transition-transform ring-4 ring-white dark:ring-slate-900"
           >
             <Plus className="w-7 h-7 stroke-[2.5]" />
           </button>
@@ -487,7 +487,7 @@ export const AppShell: React.FC = () => {
                     : 'border-slate-200 dark:border-slate-800'
                 }`}
               >
-                <BarChart3 className="w-5 h-5 text-indigo-500" />
+                <BarChart3 className="w-5 h-5 text-brand-500" />
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Statistics</span>
               </button>
 

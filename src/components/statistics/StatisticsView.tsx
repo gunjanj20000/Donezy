@@ -139,7 +139,7 @@ export const StatisticsView: React.FC = () => {
 
         {/* Completion Rate */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+          <div className="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3">
             <TrendingUp className="w-5 h-5" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-0.5">
@@ -183,7 +183,7 @@ export const StatisticsView: React.FC = () => {
                 </span>
                 <div className="w-full max-w-[36px] bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden flex items-end h-full">
                   <div
-                    className="w-full bg-gradient-to-t from-brand-600 to-indigo-400 rounded-xl transition-all duration-500"
+                    className="w-full bg-gradient-to-t from-brand-600 to-accent-400 rounded-xl transition-all duration-500"
                     style={{ height: `${heightPercent}%` }}
                   />
                 </div>

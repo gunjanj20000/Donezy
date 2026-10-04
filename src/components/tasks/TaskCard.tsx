@@ -87,7 +87,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       {/* Category accent left bar */}
       <div 
         className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors"
-        style={{ backgroundColor: category?.color || '#6366f1' }}
+        style={{ backgroundColor: task.color || category?.color || 'rgb(var(--brand-500))' }}
       />
 
       <div className="pl-4 pr-3 py-3.5 flex items-start gap-3">

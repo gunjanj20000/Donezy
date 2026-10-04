@@ -17,6 +17,11 @@ import {
 import { useApp } from '../../context/AppContext';
 import { Task, Priority, TaskRecurrence } from '../../types';
 
+const TASK_PALETTE = [
+  '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#84cc16',
+  '#f59e0b', '#f97316', '#f43f5e', '#ec4899', '#8b5cf6'
+];
+
 export const TaskDetailModal: React.FC = () => {
   const { selectedTaskForEdit, setSelectedTaskForEdit, updateTask, deleteTask, categories } = useApp();
 
@@ -26,6 +31,7 @@ export const TaskDetailModal: React.FC = () => {
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [priority, setPriority] = useState<Priority>('none');
   const [categoryId, setCategoryId] = useState('personal');
+  const [color, setColor] = useState<string | undefined>(undefined);
   const [recurrence, setRecurrence] = useState<TaskRecurrence | undefined>(undefined);
   const [notes, setNotes] = useState('');
   const [location, setLocation] = useState('');
@@ -42,6 +48,7 @@ export const TaskDetailModal: React.FC = () => {
       setReminderEnabled(Boolean(selectedTaskForEdit.reminder?.enabled));
       setPriority(selectedTaskForEdit.priority);
       setCategoryId(selectedTaskForEdit.categoryId || 'personal');
+      setColor(selectedTaskForEdit.color);
       setRecurrence(selectedTaskForEdit.recurrence);
       setNotes(selectedTaskForEdit.notes || '');
       setLocation(selectedTaskForEdit.location || '');
@@ -61,6 +68,7 @@ export const TaskDetailModal: React.FC = () => {
       reminder: reminderEnabled ? { enabled: true, time: dueTime } : undefined,
       priority,
       categoryId,
+      color: color || undefined,
       recurrence,
       notes: notes.trim(),
       location: location.trim(),
@@ -224,6 +232,46 @@ export const TaskDetailModal: React.FC = () => {
                   {cat.name}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Color Highlight Palette */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Task Color Highlight
+              </label>
+              {color && (
+                <button
+                  type="button"
+                  onClick={() => setColor(undefined)}
+                  className="text-[10px] text-slate-400 hover:text-rose-500 font-semibold"
+                >
+                  Reset to category color
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {TASK_PALETTE.map(col => (
+                <button
+                  key={col}
+                  type="button"
+                  onClick={() => setColor(col)}
+                  className={`w-6 h-6 rounded-full transition-transform ${
+                    color?.toLowerCase() === col.toLowerCase()
+                      ? 'ring-2 ring-offset-2 ring-brand-500 scale-110 shadow-sm'
+                      : 'hover:scale-105'
+                  }`}
+                  style={{ backgroundColor: col }}
+                />
+              ))}
+              <input
+                type="color"
+                value={color || '#6366f1'}
+                onChange={e => setColor(e.target.value)}
+                className="w-6 h-6 rounded-full border border-slate-300 dark:border-slate-600 cursor-pointer p-0 bg-transparent overflow-hidden"
+                title="Custom Color"
+              />
             </div>
           </div>
 

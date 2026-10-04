@@ -183,12 +183,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Dark mode
     if (settings.darkMode) {
       root.classList.add('dark');
+      try { localStorage.setItem('donezy_dark', 'true'); } catch {}
     } else {
       root.classList.remove('dark');
+      try { localStorage.setItem('donezy_dark', 'false'); } catch {}
     }
 
     // Theme attribute
-    root.setAttribute('data-theme', settings.theme || 'vibrant');
+    const currentTheme = settings.theme || 'vibrant';
+    root.setAttribute('data-theme', currentTheme);
+    try { localStorage.setItem('donezy_theme', currentTheme); } catch {}
 
     // Update meta theme-color to match status bar
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');

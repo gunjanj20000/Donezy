@@ -65,7 +65,7 @@ export const FirstRunWelcomeModal: React.FC = () => {
           <button
             type="button"
             onClick={handleCreateTask}
-            className="w-full min-h-[48px] py-3 px-5 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 active:scale-95 transition-all"
+            className="w-full min-h-[48px] py-3 px-5 rounded-2xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Create your first task</span>
