@@ -21,15 +21,13 @@ import { TaskCard } from '../tasks/TaskCard';
 import { getGreeting, isTaskOverdue, isTaskDueNow, parseLocalDate, formatDateLabel } from '../../utils/dateUtils';
 import { format, isToday, isTomorrow, isAfter, parseISO, differenceInCalendarDays } from 'date-fns';
 
-type BlockFilterMode = 'all' | 'today' | 'upcoming';
-
 export const TodayView: React.FC = () => {
-  const { tasks, openQuickAdd, searchQuery, selectedCategoryFilter, categories } = useApp();
+  const { tasks, openQuickAdd, searchQuery, selectedCategoryFilter, categories, settings } = useApp();
   const greeting = getGreeting();
   const todayFormatted = format(new Date(), 'EEEE, MMMM d');
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  const [blockFilter, setBlockFilter] = useState<BlockFilterMode>('all');
+  const mainPageView = settings.mainPageView || 'both';
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);
 
   // Filter tasks for Today view & Upcoming block
@@ -227,52 +225,10 @@ export const TodayView: React.FC = () => {
             />
           </div>
         </div>
-
-        {/* Block View Mode Segmented Controls */}
-        <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
-          <div className="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
-            <button
-              onClick={() => setBlockFilter('all')}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                blockFilter === 'all'
-                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              Both Blocks
-            </button>
-            <button
-              onClick={() => setBlockFilter('today')}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                blockFilter === 'today'
-                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              Today ({todayPendingCount})
-            </button>
-            <button
-              onClick={() => setBlockFilter('upcoming')}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                blockFilter === 'upcoming'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              Upcoming ({upcomingTasks.length})
-            </button>
-          </div>
-
-          <div className="text-[11px] font-medium text-slate-400">
-            {blockFilter === 'all' && 'Showing Today & Upcoming side by side'}
-            {blockFilter === 'today' && "Focusing on Today's schedule"}
-            {blockFilter === 'upcoming' && 'Focusing on future tasks'}
-          </div>
-        </div>
       </div>
 
       {/* 2. BLOCK 1: TODAY'S TASKS */}
-      {(blockFilter === 'all' || blockFilter === 'today') && (
+      {(mainPageView === 'both' || mainPageView === 'today') && (
         <section aria-labelledby="today-block-heading" className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-sm space-y-4 transition-all">
           {/* Today Block Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -410,7 +366,7 @@ export const TodayView: React.FC = () => {
       )}
 
       {/* 3. BLOCK 2: UPCOMING TASKS */}
-      {(blockFilter === 'all' || blockFilter === 'upcoming') && (
+      {(mainPageView === 'both' || mainPageView === 'upcoming') && (
         <section aria-labelledby="upcoming-block-heading" className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-sm space-y-4 transition-all">
           {/* Upcoming Block Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">

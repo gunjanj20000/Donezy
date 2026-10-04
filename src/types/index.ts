@@ -68,11 +68,14 @@ export type ThemeType = 'vibrant' | 'ocean' | 'sunset' | 'forest' | 'lavender' |
 
 export type ReminderTone = 'chime' | 'bell' | 'marimba' | 'cosmic' | 'digital' | 'zen';
 
+export type MainPageViewMode = 'both' | 'today' | 'upcoming';
+
 export interface AppSettings {
   theme: ThemeType;
   darkMode: boolean;
   soundEnabled: boolean;
   reminderTone?: ReminderTone;
+  mainPageView?: MainPageViewMode;
   vibrationEnabled: boolean;
   celebrationConfetti: boolean;
   defaultReminderOffset: number; // minutes before due

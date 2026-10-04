@@ -21,10 +21,12 @@ import {
   Play,
   RefreshCw,
   Smartphone,
-  Info
+  Info,
+  Layers,
+  CalendarClock
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ThemeType, Category, ReminderTone } from '../../types';
+import { ThemeType, Category, ReminderTone, MainPageViewMode } from '../../types';
 import { sounds, NotificationService } from '../../services/NotificationService';
 import { BackupRestoreService, SmartDayBackup } from '../../services/BackupRestoreService';
 import { IconRenderer } from '../common/IconRenderer';
@@ -287,6 +289,85 @@ export const SettingsView: React.FC = () => {
                   </span>
                 </div>
                 {isSelected && <Check className="w-4 h-4 text-brand-600 dark:text-brand-400 stroke-[3]" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MAIN SCREEN BLOCKS & LAYOUT */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              Main Screen Blocks
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Configure which task blocks appear on your main Today screen.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            {
+              id: 'both' as MainPageViewMode,
+              title: 'Both Blocks',
+              badge: 'Recommended',
+              desc: 'Shows Today’s Tasks and Upcoming Tasks as two separate blocks',
+              icon: <Layers className="w-4 h-4 text-brand-500" />
+            },
+            {
+              id: 'today' as MainPageViewMode,
+              title: 'Today Only',
+              badge: undefined,
+              desc: 'Focus only on today’s scheduled tasks and overdue items',
+              icon: <Sparkles className="w-4 h-4 text-amber-500" />
+            },
+            {
+              id: 'upcoming' as MainPageViewMode,
+              title: 'Upcoming Only',
+              badge: undefined,
+              desc: 'Focus only on tasks scheduled for tomorrow and future dates',
+              icon: <CalendarClock className="w-4 h-4 text-indigo-500" />
+            }
+          ].map(opt => {
+            const isSelected = (settings.mainPageView || 'both') === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => updateSettings({ mainPageView: opt.id })}
+                className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                  isSelected
+                    ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 ring-2 ring-brand-500/20'
+                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-850'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {opt.icon}
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        {opt.title}
+                      </span>
+                    </div>
+                    {isSelected && (
+                      <div className="w-4 h-4 rounded-full bg-brand-600 text-white flex items-center justify-center">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    )}
+                  </div>
+                  {opt.badge && (
+                    <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-900/60 text-brand-700 dark:text-brand-300 mb-1.5">
+                      {opt.badge}
+                    </span>
+                  )}
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {opt.desc}
+                  </p>
+                </div>
               </button>
             );
           })}
