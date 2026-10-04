@@ -189,7 +189,7 @@ export const TodayView: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => openQuickAdd()}
-              className="inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-semibold text-xs sm:text-sm shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+              className="hidden sm:inline-flex items-center gap-2 min-h-[44px] px-4 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-semibold text-xs sm:text-sm shadow-md shadow-brand-500/20 active:scale-95 transition-all"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Add Task</span>
@@ -255,15 +255,6 @@ export const TodayView: React.FC = () => {
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={() => openQuickAdd()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 text-brand-600 dark:text-brand-300 text-xs font-bold transition-colors min-h-[38px] active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add to Today</span>
-              <span className="sm:hidden">Add</span>
-            </button>
           </div>
 
           {/* Today Block Contents */}
@@ -330,7 +321,7 @@ export const TodayView: React.FC = () => {
                   className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Add another task for today</span>
+                  <span>Add a task</span>
                 </button>
               </div>
             )}
@@ -388,15 +379,6 @@ export const TodayView: React.FC = () => {
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={() => openQuickAdd('Tomorrow ')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-50 hover:bg-accent-100 dark:bg-accent-950/60 dark:hover:bg-accent-900/60 text-accent-600 dark:text-accent-300 text-xs font-bold transition-colors min-h-[38px] active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Upcoming</span>
-              <span className="sm:hidden">Add</span>
-            </button>
           </div>
 
           {/* Upcoming Block Contents */}
@@ -447,7 +429,7 @@ export const TodayView: React.FC = () => {
                   className="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Plan upcoming task</span>
+                  <span>Add upcoming task</span>
                 </button>
               </div>
             )}
