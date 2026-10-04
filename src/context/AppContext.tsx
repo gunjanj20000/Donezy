@@ -442,7 +442,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSettings(updated);
   }, []);
 
-  // Background Reminder Ticker (every 20s)
+  // Background Reminder Ticker (checks every 15s)
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -452,26 +452,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tasks.forEach(task => {
         if (task.completed || !task.reminder?.enabled) return;
 
-        // Check if snoozed
+        // Check 1: If snoozed and snooze time arrived
         if (task.reminder.snoozedUntil) {
-          const snoozeTime = parseISO(task.reminder.snoozedUntil);
-          if (now >= snoozeTime && (!task.reminder.lastNotified || parseISO(task.reminder.lastNotified) < snoozeTime)) {
-            triggerAlarm(task);
+          const snoozeTime = new Date(task.reminder.snoozedUntil);
+          if (now >= snoozeTime && (!task.reminder.lastNotified || new Date(task.reminder.lastNotified) < snoozeTime)) {
+            triggerAlarm(task, true);
             return;
           }
         }
 
-        // Check if due time matched today
-        if (task.dueDate === todayStr && task.dueTime === currentHhMm) {
-          const lastNotifiedToday = task.reminder.lastNotified && isToday(parseISO(task.reminder.lastNotified));
-          if (!lastNotifiedToday) {
-            triggerAlarm(task);
+        // Check 2: If due today and scheduled time has arrived/passed and not yet alerted today
+        if (task.dueDate === todayStr && task.dueTime) {
+          if (task.dueTime <= currentHhMm) {
+            const lastNotifiedToday = task.reminder.lastNotified && 
+              task.reminder.lastNotified.startsWith(todayStr);
+
+            if (!lastNotifiedToday) {
+              triggerAlarm(task, false);
+            }
           }
         }
       });
-    }, 20000);
+    }, 15000);
 
-    const triggerAlarm = (task: Task) => {
+    const triggerAlarm = (task: Task, wasSnoozed: boolean) => {
       if (settings.soundEnabled) {
         sounds.playReminderChime();
       }
@@ -481,12 +485,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       NotificationService.sendNotification(task);
       setActiveReminderTask(task);
 
-      // Record last notified
+      // Record last notified and clear snoozedUntil if snoozed alarm fired
       const updated: Task = {
         ...task,
         reminder: {
           ...task.reminder!,
           lastNotified: new Date().toISOString(),
+          snoozedUntil: wasSnoozed ? undefined : task.reminder?.snoozedUntil,
         }
       };
       TaskRepository.save(updated);

@@ -243,13 +243,13 @@ export const QuickAddSheet: React.FC = () => {
             <button
               onClick={closeQuickAdd}
               aria-label="Close"
-              className="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-5 py-3 space-y-4">
             {/* Primary Input Container */}
             <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/60 rounded-2xl border-2 border-brand-500/20 focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all p-1">
               <input
@@ -266,7 +266,7 @@ export const QuickAddSheet: React.FC = () => {
                 type="button"
                 onClick={() => setIsVoiceOpen(true)}
                 title="Voice Input"
-                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 text-white hover:from-brand-600 hover:to-indigo-700 shadow-md shadow-brand-500/20 active:scale-95 transition-all mr-1"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 text-white hover:from-brand-600 hover:to-indigo-700 shadow-md shadow-brand-500/20 active:scale-95 transition-all mr-0.5"
               >
                 <Mic className="w-5 h-5" />
               </button>
@@ -555,7 +555,7 @@ export const QuickAddSheet: React.FC = () => {
             )}
 
             {/* Bottom Actions */}
-            <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={closeQuickAdd}

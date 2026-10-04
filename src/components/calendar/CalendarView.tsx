@@ -74,27 +74,27 @@ export const CalendarView: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-24 sm:pb-8">
       {/* Calendar Header with Mode Toggles */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-5 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white">
               {format(currentDate, 'MMMM yyyy')}
             </h1>
             <button
               onClick={goToToday}
-              className="text-xs font-bold px-3 py-1 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800"
+              className="text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800 min-h-[36px] flex items-center"
             >
               Today
             </button>
           </div>
 
           {/* Mode Switchers */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl self-start sm:self-auto">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl self-start sm:self-auto overflow-x-auto no-scrollbar max-w-full">
             {(['month', 'week', 'day', 'agenda'] as CalendarMode[]).map(m => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
+                className={`min-h-[38px] px-2.5 sm:px-3.5 py-1 rounded-xl text-[11px] sm:text-xs font-semibold capitalize transition-all ${
                   mode === m
                     ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -110,14 +110,14 @@ export const CalendarView: React.FC = () => {
             <button
               onClick={prevMonth}
               aria-label="Previous month"
-              className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="w-10 h-10 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={nextMonth}
               aria-label="Next month"
-              className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="w-10 h-10 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -128,16 +128,16 @@ export const CalendarView: React.FC = () => {
         {mode === 'month' && (
           <div>
             {/* Days of week header */}
-            <div className="grid grid-cols-7 gap-1 text-center mb-2">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center mb-1 sm:mb-2">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                <div key={day} className="text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1">
+                <div key={day} className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider py-1 truncate">
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
               {daysInMonthGrid.map(day => {
                 const dayStr = format(day, 'yyyy-MM-dd');
                 const dayTasks = tasksByDate.get(dayStr) || [];
@@ -150,14 +150,14 @@ export const CalendarView: React.FC = () => {
                     key={dayStr}
                     type="button"
                     onClick={() => setSelectedDate(day)}
-                    className={`min-h-[58px] sm:min-h-[70px] p-1.5 rounded-2xl flex flex-col items-center justify-between border transition-all text-left relative ${
+                    className={`min-h-[48px] sm:min-h-[68px] p-0.5 sm:p-1.5 rounded-xl sm:rounded-2xl flex flex-col items-center justify-between border transition-all text-left relative ${
                       isSelected
                         ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 shadow-sm'
                         : 'border-slate-100 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                     } ${!isCurrentMonth ? 'opacity-35' : ''}`}
                   >
                     <span
-                      className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold ${
+                      className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[11px] sm:text-xs font-bold ${
                         isTodayDate
                           ? 'bg-brand-600 text-white shadow-sm'
                           : isSelected
@@ -170,17 +170,17 @@ export const CalendarView: React.FC = () => {
 
                     {/* Task count dots */}
                     {dayTasks.length > 0 && (
-                      <div className="flex items-center gap-0.5 mt-1">
+                      <div className="flex items-center gap-0.5 mt-0.5 mb-0.5">
                         {dayTasks.slice(0, 3).map((t, idx) => (
                           <span
                             key={idx}
-                            className={`w-1.5 h-1.5 rounded-full ${
+                            className={`w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full ${
                               t.completed ? 'bg-emerald-400' : 'bg-brand-500'
                             }`}
                           />
                         ))}
                         {dayTasks.length > 3 && (
-                          <span className="text-[9px] font-bold text-slate-400 leading-none">
+                          <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 leading-none">
                             +{dayTasks.length - 3}
                           </span>
                         )}

@@ -3,15 +3,31 @@ import {
   isToday, 
   isTomorrow, 
   isYesterday, 
-  parseISO, 
   addHours, 
   addDays, 
   startOfTomorrow, 
   nextSaturday, 
   nextMonday, 
-  isBefore,
   parse
 } from 'date-fns';
+
+/**
+ * Safely parse 'yyyy-MM-dd' string into a Date object at local midnight,
+ * preventing any UTC off-by-one timezone shifting.
+ */
+export function parseLocalDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+      return new Date(year, month, day, 0, 0, 0, 0);
+    }
+  }
+  return new Date(dateStr);
+}
 
 export function getGreeting(): { text: string; icon: string } {
   const hour = new Date().getHours();
@@ -28,7 +44,7 @@ export function getGreeting(): { text: string; icon: string } {
 
 export function formatDateLabel(dateStr: string): string {
   try {
-    const d = parseISO(dateStr);
+    const d = parseLocalDate(dateStr);
     if (isToday(d)) return 'Today';
     if (isTomorrow(d)) return 'Tomorrow';
     if (isYesterday(d)) return 'Yesterday';
@@ -48,32 +64,84 @@ export function formatTimeDisplay(timeStr?: string, is12Hour: boolean = true): s
   }
 }
 
+/**
+ * Checks if a task is overdue taking exact local date & time into account.
+ * - Tasks due on earlier dates are ALWAYS overdue.
+ * - Tasks due today with a specific dueTime are overdue once that time has passed.
+ * - Tasks due today with NO time specified are NOT overdue until the next calendar day.
+ * - Tasks due in the future are never overdue.
+ */
 export function isTaskOverdue(dueDate: string, dueTime?: string): boolean {
   try {
     const now = new Date();
-    if (dueTime) {
-      const dt = parseISO(`${dueDate}T${dueTime}`);
-      return isBefore(dt, now);
-    } else {
-      const d = parseISO(`${dueDate}T23:59:59`);
-      return isBefore(d, now);
+    const todayStr = format(now, 'yyyy-MM-dd');
+
+    // If dueDate is before today, it's overdue
+    if (dueDate < todayStr) {
+      return true;
     }
+
+    // If dueDate is after today, it's not overdue
+    if (dueDate > todayStr) {
+      return false;
+    }
+
+    // Due today: check time if specified
+    if (dueTime) {
+      const timeParts = dueTime.split(':');
+      if (timeParts.length >= 2) {
+        const hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        const target = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          hours,
+          minutes,
+          0,
+          0
+        );
+        return target.getTime() < now.getTime();
+      }
+    }
+
+    // Due today without specific time: not overdue during the day
+    return false;
   } catch {
     return false;
   }
 }
 
+/**
+ * Checks if a task is due right around current time (within -30 min to +60 min).
+ */
 export function isTaskDueNow(dueDate: string, dueTime?: string): boolean {
   if (!dueTime) return false;
   try {
     const now = new Date();
-    const dt = parseISO(`${dueDate}T${dueTime}`);
-    const diffMinutes = (dt.getTime() - now.getTime()) / (1000 * 60);
-    // Due now if between -30 mins and +60 mins
-    return diffMinutes >= -30 && diffMinutes <= 60;
+    const todayStr = format(now, 'yyyy-MM-dd');
+    if (dueDate !== todayStr) return false;
+
+    const timeParts = dueTime.split(':');
+    if (timeParts.length >= 2) {
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1], 10);
+      const target = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hours,
+        minutes,
+        0,
+        0
+      );
+      const diffMinutes = (target.getTime() - now.getTime()) / (1000 * 60);
+      return diffMinutes >= -30 && diffMinutes <= 60;
+    }
   } catch {
     return false;
   }
+  return false;
 }
 
 export function getSmartTimePresets() {

@@ -180,7 +180,7 @@ export const AppShell: React.FC = () => {
       {/* Main Container */}
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* DESKTOP / IPAD SIDEBAR */}
-        <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 border-r border-slate-200/80 dark:border-slate-800 p-5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md sticky top-0 h-screen overflow-y-auto">
+        <aside className="hidden md:flex flex-col w-56 lg:w-64 xl:w-72 shrink-0 border-r border-slate-200/80 dark:border-slate-800 p-4 lg:p-5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md sticky top-0 h-screen overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-6 px-2">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/25">
@@ -248,7 +248,7 @@ export const AppShell: React.FC = () => {
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
             <button
               onClick={() => updateSettings({ darkMode: !settings.darkMode })}
-              className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+              className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors min-h-[44px]"
             >
               {settings.darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
               <span className="font-semibold">{settings.darkMode ? 'Light' : 'Dark'}</span>
@@ -260,7 +260,7 @@ export const AppShell: React.FC = () => {
         </aside>
 
         {/* WORKSPACE CENTER AREA */}
-        <main className="flex-1 px-4 sm:px-6 md:px-8 py-6 min-w-0">
+        <main className="flex-1 px-3 sm:px-6 md:px-8 py-4 sm:py-6 min-w-0 max-w-full overflow-x-hidden">
           {selectedTab === 'today' && <TodayView />}
           {selectedTab === 'calendar' && <CalendarView />}
           {selectedTab === 'tasks' && <TasksView />}
@@ -271,7 +271,7 @@ export const AppShell: React.FC = () => {
         </main>
 
         {/* DESKTOP RIGHT-SIDE PANEL (Widget area) */}
-        <aside className="hidden xl:block w-72 shrink-0 border-l border-slate-200/80 dark:border-slate-800 p-6 space-y-6 sticky top-0 h-screen overflow-y-auto">
+        <aside className="hidden xl:block w-64 2xl:w-72 shrink-0 border-l border-slate-200/80 dark:border-slate-800 p-5 2xl:p-6 space-y-6 sticky top-0 h-screen overflow-y-auto">
           {/* Today's Progress Card */}
           <div className="bg-gradient-to-br from-brand-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-brand-500/20">
             <span className="text-[11px] font-bold uppercase tracking-wider text-brand-200 block mb-1">
@@ -304,7 +304,7 @@ export const AppShell: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedTab('reminders')}
-                className="text-[11px] font-semibold text-brand-600 hover:underline"
+                className="text-[11px] font-semibold text-brand-600 hover:underline min-h-[44px] flex items-center"
               >
                 View all
               </button>
@@ -349,7 +349,7 @@ export const AppShell: React.FC = () => {
                 <button
                   key={p.label}
                   onClick={() => openQuickAdd(p.prefix)}
-                  className="p-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left border border-slate-100 dark:border-slate-700 transition-colors"
+                  className="min-h-[44px] p-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-left border border-slate-100 dark:border-slate-700 transition-colors"
                 >
                   {p.label}
                 </button>
@@ -360,7 +360,7 @@ export const AppShell: React.FC = () => {
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 sm:px-3 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] flex items-center justify-around select-none">
         <button
           onClick={() => setSelectedTab('today')}
           aria-label="Today"

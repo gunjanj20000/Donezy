@@ -185,33 +185,43 @@ export const HabitsView: React.FC = () => {
           return (
             <div 
               key={habit.id}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               {/* Habit Title & Streak */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pr-10 sm:pr-0">
                 <div 
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
                   style={{ backgroundColor: `${habit.color}20`, color: habit.color }}
                 >
-                  <IconRenderer name={habit.icon} className="w-6 h-6" />
+                  <IconRenderer name={habit.icon} className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 truncate">
                     {habit.title}
                   </h3>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1 font-semibold text-amber-500">
                       <Flame className="w-3.5 h-3.5 fill-amber-500" />
-                      {streak} day streak
+                      {streak}d streak
                     </span>
                     <span>•</span>
-                    <span>{habit.completedDates.length} total check-ins</span>
+                    <span>{habit.completedDates.length} check-ins</span>
                   </div>
                 </div>
               </div>
 
+              {/* Delete Habit */}
+              <button
+                type="button"
+                onClick={() => deleteHabit(habit.id)}
+                aria-label="Delete habit"
+                className="absolute top-3.5 right-3.5 sm:static w-9 h-9 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+
               {/* 7-Day Completion Dots */}
-              <div className="flex items-center gap-1.5 sm:gap-2 self-center sm:self-auto">
+              <div className="w-full sm:w-auto overflow-x-auto no-scrollbar pb-0.5 flex items-center justify-between sm:justify-start gap-1 sm:gap-1.5">
                 {last7Days.map(day => {
                   const isDone = habit.completedDates.includes(day.date);
                   return (
@@ -219,7 +229,7 @@ export const HabitsView: React.FC = () => {
                       key={day.date}
                       type="button"
                       onClick={() => toggleHabit(habit.id, day.date)}
-                      className={`min-w-[44px] min-h-[50px] px-1 py-1.5 rounded-2xl flex flex-col items-center justify-between border transition-all active:scale-95 ${
+                      className={`flex-1 sm:flex-none w-9 sm:w-11 min-h-[46px] sm:min-h-[50px] px-1 py-1 rounded-xl sm:rounded-2xl flex flex-col items-center justify-between border transition-all active:scale-95 ${
                         isDone
                           ? 'border-transparent text-white shadow-sm'
                           : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -229,29 +239,19 @@ export const HabitsView: React.FC = () => {
                       }}
                       title={`${day.dayName} (${day.date}): ${isDone ? 'Completed' : 'Not completed'}`}
                     >
-                      <span className={`text-[10px] font-bold uppercase ${isDone ? 'text-white/80' : 'text-slate-400'}`}>
+                      <span className={`text-[9px] sm:text-[10px] font-bold uppercase ${isDone ? 'text-white/80' : 'text-slate-400'}`}>
                         {day.dayName}
                       </span>
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center ${isDone ? 'bg-white/20' : ''}`}>
+                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center ${isDone ? 'bg-white/20' : ''}`}>
                         {isDone ? (
-                          <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
+                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3] text-white" />
                         ) : (
-                          <span className="text-[11px] font-semibold text-slate-500">{day.dayNumber}</span>
+                          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500">{day.dayNumber}</span>
                         )}
                       </div>
                     </button>
                   );
                 })}
-
-                {/* Delete Habit */}
-                <button
-                  type="button"
-                  onClick={() => deleteHabit(habit.id)}
-                  aria-label="Delete habit"
-                  className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 ml-1 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
             </div>
           );

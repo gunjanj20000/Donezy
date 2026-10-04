@@ -90,12 +90,12 @@ export const TodayView: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-24 sm:pb-8">
       {/* Header & Productivity Summary */}
-      <div className="bg-gradient-to-br from-white via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-br from-white via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 p-4 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl">{greeting.icon}</span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <span className="text-xl sm:text-2xl">{greeting.icon}</span>
+              <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 {greeting.text}
               </h1>
             </div>
@@ -115,13 +115,13 @@ export const TodayView: React.FC = () => {
         </div>
 
         {/* Productivity Summary Bar */}
-        <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+        <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center justify-between sm:justify-start flex-wrap gap-2">
+            <span className="text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-300">
               {totalTodayCount} {totalTodayCount === 1 ? 'task' : 'tasks'} today
             </span>
             <span className="text-slate-300 dark:text-slate-700">•</span>
-            <span className="text-xs font-mono font-bold text-brand-600 dark:text-brand-400 tracking-wider">
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-brand-600 dark:text-brand-400 tracking-wider">
               {blockVisual} {completionPercentage}%
             </span>
           </div>
