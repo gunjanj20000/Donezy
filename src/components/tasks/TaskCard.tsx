@@ -8,25 +8,54 @@ import {
   Bell, 
   MapPin, 
   CheckSquare,
-  AlertCircle
+  Square,
+  AlertCircle,
+  Plus,
+  Mic,
+  ChevronDown,
+  ChevronUp,
+  ListChecks,
+  X
 } from 'lucide-react';
 import { Task } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { formatTimeDisplay, isTaskOverdue, isTaskDueNow, formatDateLabel } from '../../utils/dateUtils';
 import { IconRenderer } from '../common/IconRenderer';
+import { useSpeechRecognition } from '../../utils/useSpeechRecognition';
 
 interface TaskCardProps {
   task: Task;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
-  const { categories, toggleTaskComplete, deleteTask, setSelectedTaskForEdit, settings } = useApp();
+  const { categories, toggleTaskComplete, updateTask, deleteTask, setSelectedTaskForEdit, settings } = useApp();
   const category = categories.find(c => c.id === task.categoryId);
 
   // Swipe handling
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState<number>(0);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Subtask UI state on card
+  const [showAllSubtasks, setShowAllSubtasks] = useState(false);
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
+  const [cardSubtaskInput, setCardSubtaskInput] = useState('');
+
+  // Subtask voice recognition hook for card
+  const {
+    isListening: isCardSubtaskListening,
+    start: startCardSubtaskVoice,
+    stop: stopCardSubtaskVoice,
+  } = useSpeechRecognition({
+    onResult: (text) => {
+      setCardSubtaskInput(text);
+    },
+    onEnd: (text) => {
+      if (text?.trim()) {
+        setCardSubtaskInput(text.trim());
+      }
+    },
+  });
 
   const isOverdue = !task.completed && isTaskOverdue(task.dueDate, task.dueTime);
   const isDueNow = !task.completed && isTaskDueNow(task.dueDate, task.dueTime);
@@ -57,7 +86,37 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     setTouchStartX(null);
   };
 
-  const completedSubtasksCount = task.subtasks.filter(s => s.completed).length;
+  const handleToggleSubtask = async (e: React.MouseEvent, subtaskId: string) => {
+    e.stopPropagation();
+    const updatedSubtasks = (task.subtasks || []).map(s => 
+      s.id === subtaskId ? { ...s, completed: !s.completed } : s
+    );
+    await updateTask({
+      ...task,
+      subtasks: updatedSubtasks,
+    });
+  };
+
+  const handleAddSubtaskOnCard = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!cardSubtaskInput.trim()) return;
+
+    const newSub = {
+      id: `sub-${Date.now()}`,
+      title: cardSubtaskInput.trim(),
+      completed: false,
+    };
+
+    await updateTask({
+      ...task,
+      subtasks: [...(task.subtasks || []), newSub],
+    });
+
+    setCardSubtaskInput('');
+    setIsAddingSubtask(false);
+  };
+
+  const completedSubtasksCount = (task.subtasks || []).filter(s => s.completed).length;
 
   const priorityColor = {
     high: 'text-rose-500 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900',
@@ -192,14 +251,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               </span>
             )}
 
-            {/* Subtask count */}
-            {task.subtasks && task.subtasks.length > 0 && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
-                <CheckSquare className="w-3 h-3" />
-                {completedSubtasksCount}/{task.subtasks.length}
-              </span>
-            )}
-
             {/* Reminder enabled icon */}
             {task.reminder?.enabled && (
               <span className="text-brand-500" title="Reminder Active">
@@ -215,6 +266,161 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               </span>
             )}
           </div>
+
+          {/* Subtasks Section on Main Page */}
+          {((task.subtasks && task.subtasks.length > 0) || isAddingSubtask) && (
+            <div 
+              onClick={e => e.stopPropagation()} 
+              className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 cursor-default"
+            >
+              {/* Subtask Header & Progress */}
+              {task.subtasks && task.subtasks.length > 0 && (
+                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <ListChecks className="w-3.5 h-3.5 text-brand-500" />
+                    <span>Subtasks ({completedSubtasksCount}/{task.subtasks.length})</span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-emerald-500 transition-all duration-300"
+                      style={{ width: `${(completedSubtasksCount / task.subtasks.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Subtask Items */}
+              {task.subtasks && task.subtasks.length > 0 && (
+                <div className="space-y-1">
+                  {(showAllSubtasks ? task.subtasks : task.subtasks.slice(0, 3)).map(st => (
+                    <div
+                      key={st.id}
+                      onClick={(e) => handleToggleSubtask(e, st.id)}
+                      className={`group/st flex items-center gap-2 px-2 py-1 rounded-lg transition-colors cursor-pointer ${
+                        st.completed
+                          ? 'text-slate-400 dark:text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/40'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => handleToggleSubtask(e, st.id)}
+                        aria-label={st.completed ? `Mark subtask "${st.title}" incomplete` : `Mark subtask "${st.title}" complete`}
+                        className="text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shrink-0 p-0.5"
+                      >
+                        {st.completed ? (
+                          <CheckSquare className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/10" />
+                        ) : (
+                          <Square className="w-3.5 h-3.5 text-slate-400 group-hover/st:text-slate-600 dark:group-hover/st:text-slate-300" />
+                        )}
+                      </button>
+                      <span className={`text-xs break-words transition-colors ${st.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
+                        {st.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Show more/less toggle button if > 3 subtasks */}
+              {task.subtasks && task.subtasks.length > 3 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllSubtasks(prev => !prev);
+                  }}
+                  className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline px-2 py-0.5 flex items-center gap-1"
+                >
+                  {showAllSubtasks ? (
+                    <>
+                      <span>Show less</span>
+                      <ChevronUp className="w-3 h-3" />
+                    </>
+                  ) : (
+                    <>
+                      <span>+{task.subtasks.length - 3} more subtasks</span>
+                      <ChevronDown className="w-3 h-3" />
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Add subtask inline on card */}
+              {isAddingSubtask ? (
+                <div className="pt-1 flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={cardSubtaskInput}
+                      onChange={e => setCardSubtaskInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddSubtaskOnCard(e);
+                        } else if (e.key === 'Escape') {
+                          e.preventDefault();
+                          setIsAddingSubtask(false);
+                          setCardSubtaskInput('');
+                        }
+                      }}
+                      autoFocus
+                      placeholder={isCardSubtaskListening ? '🎙️ Listening... speak subtask' : 'New subtask...'}
+                      className={`w-full bg-slate-50 dark:bg-slate-800 border rounded-lg pl-2.5 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-all ${
+                        isCardSubtaskListening
+                          ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/30'
+                          : 'border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-brand-500'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={isCardSubtaskListening ? stopCardSubtaskVoice : startCardSubtaskVoice}
+                      title={isCardSubtaskListening ? 'Stop listening' : 'Voice input for subtask'}
+                      className={`absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center transition-all ${
+                        isCardSubtaskListening
+                          ? 'bg-rose-500 text-white animate-pulse'
+                          : 'text-slate-400 hover:text-brand-500'
+                      }`}
+                    >
+                      <Mic className={`w-3 h-3 ${isCardSubtaskListening ? 'animate-bounce' : ''}`} />
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddSubtaskOnCard}
+                    disabled={!cardSubtaskInput.trim()}
+                    className="px-2.5 py-1.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsAddingSubtask(false);
+                      setCardSubtaskInput('');
+                    }}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAddingSubtask(true);
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2 py-0.5 transition-colors mt-0.5"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Add subtask</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons (Quick edit / Delete) */}

@@ -56,9 +56,10 @@ interface IconRendererProps {
   name: string;
   className?: string;
   size?: number;
+  style?: React.CSSProperties;
 }
 
-export const IconRenderer: React.FC<IconRendererProps> = ({ name, className = 'w-5 h-5', size }) => {
+export const IconRenderer: React.FC<IconRendererProps> = ({ name, className = 'w-5 h-5', size, style }) => {
   const IconComponent = ICON_MAP[name] || CircleDot;
-  return <IconComponent className={className} size={size} />;
+  return <IconComponent className={className} size={size} style={style} />;
 };
