@@ -189,6 +189,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Theme attribute
     root.setAttribute('data-theme', settings.theme || 'vibrant');
+
+    // Update meta theme-color to match status bar
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', settings.darkMode ? '#0f172a' : '#ffffff');
+    }
   }, [settings?.darkMode, settings?.theme]);
 
   // Handle URL parameters for PWA shortcuts (e.g. ?action=add, ?action=voice, ?tab=calendar)

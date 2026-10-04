@@ -119,7 +119,7 @@ export const AppShell: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col antialiased">
       {/* Top Bar for Mobile & Tablet */}
-      <header className="md:hidden sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+      <header className="md:hidden sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 header-safe-top pb-3 flex items-center justify-between transition-colors">
         <div className="flex items-center gap-2.5">
           <img
             src="/donezy-icon.svg"
@@ -182,7 +182,7 @@ export const AppShell: React.FC = () => {
       {/* Main Container */}
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* DESKTOP / IPAD SIDEBAR */}
-        <aside className="hidden md:flex flex-col w-56 lg:w-64 xl:w-72 shrink-0 border-r border-slate-200/80 dark:border-slate-800 p-4 lg:p-5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md sticky top-0 h-screen overflow-y-auto">
+        <aside className="hidden md:flex flex-col w-56 lg:w-64 xl:w-72 shrink-0 border-r border-slate-200/80 dark:border-slate-800 p-4 lg:p-5 pt-[calc(1rem+env(safe-area-inset-top,0px))] bg-white/60 dark:bg-slate-900/60 backdrop-blur-md sticky top-0 h-screen overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-6 px-2">
             <img
@@ -275,7 +275,7 @@ export const AppShell: React.FC = () => {
         </main>
 
         {/* DESKTOP RIGHT-SIDE PANEL (Widget area) */}
-        <aside className="hidden xl:block w-64 2xl:w-72 shrink-0 border-l border-slate-200/80 dark:border-slate-800 p-5 2xl:p-6 space-y-6 sticky top-0 h-screen overflow-y-auto">
+        <aside className="hidden xl:block w-64 2xl:w-72 shrink-0 border-l border-slate-200/80 dark:border-slate-800 p-5 2xl:p-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] space-y-6 sticky top-0 h-screen overflow-y-auto">
           {/* Today's Progress Card */}
           <div className="bg-gradient-to-br from-brand-600 to-indigo-700 text-white rounded-3xl p-5 shadow-lg shadow-brand-500/20">
             <span className="text-[11px] font-bold uppercase tracking-wider text-brand-200 block mb-1">
@@ -364,7 +364,7 @@ export const AppShell: React.FC = () => {
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 sm:px-3 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] flex items-center justify-around select-none">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 sm:px-3 pt-1.5 nav-safe-bottom pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] flex items-center justify-around select-none">
         <button
           onClick={() => setSelectedTab('today')}
           aria-label="Today"
@@ -431,7 +431,7 @@ export const AppShell: React.FC = () => {
         >
           <div 
             onClick={e => e.stopPropagation()}
-            className="w-full bg-white dark:bg-slate-900 rounded-t-3xl p-5 border-t border-slate-200 dark:border-slate-800 space-y-3 animate-slide-up"
+            className="w-full bg-white dark:bg-slate-900 rounded-t-3xl p-5 sheet-safe-bottom border-t border-slate-200 dark:border-slate-800 space-y-3 animate-slide-up"
           >
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
               <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
