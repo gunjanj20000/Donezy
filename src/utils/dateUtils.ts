@@ -64,6 +64,40 @@ export function formatTimeDisplay(timeStr?: string, is12Hour: boolean = true): s
   }
 }
 
+export function formatAddedDate(isoString?: string): string {
+  if (!isoString) return '';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '';
+    if (isToday(d)) {
+      return `Today at ${format(d, 'h:mm a')}`;
+    }
+    if (isYesterday(d)) {
+      return `Yesterday at ${format(d, 'h:mm a')}`;
+    }
+    return format(d, "MMM d, yyyy 'at' h:mm a");
+  } catch {
+    return '';
+  }
+}
+
+export function formatCompletedDate(isoString?: string): string {
+  if (!isoString) return '';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '';
+    if (isToday(d)) {
+      return `Today at ${format(d, 'h:mm a')}`;
+    }
+    if (isYesterday(d)) {
+      return `Yesterday at ${format(d, 'h:mm a')}`;
+    }
+    return format(d, "MMM d, yyyy 'at' h:mm a");
+  } catch {
+    return '';
+  }
+}
+
 /**
  * Checks if a task is overdue taking exact local date & time into account.
  * - Tasks due on earlier dates are ALWAYS overdue.

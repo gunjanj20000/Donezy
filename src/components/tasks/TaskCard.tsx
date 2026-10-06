@@ -15,11 +15,22 @@ import {
   ChevronDown,
   ChevronUp,
   ListChecks,
-  X
+  X,
+  Calendar,
+  CheckCircle2,
+  AlignLeft,
+  Tag as TagIcon
 } from 'lucide-react';
 import { Task } from '../../types';
 import { useApp } from '../../context/AppContext';
-import { formatTimeDisplay, isTaskOverdue, isTaskDueNow, formatDateLabel } from '../../utils/dateUtils';
+import { 
+  formatTimeDisplay, 
+  isTaskOverdue, 
+  isTaskDueNow, 
+  formatDateLabel,
+  formatAddedDate,
+  formatCompletedDate
+} from '../../utils/dateUtils';
 import { IconRenderer } from '../common/IconRenderer';
 import { useSpeechRecognition } from '../../utils/useSpeechRecognition';
 
@@ -30,6 +41,9 @@ interface TaskCardProps {
 export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const { categories, toggleTaskComplete, updateTask, deleteTask, setSelectedTaskForEdit, settings } = useApp();
   const category = categories.find(c => c.id === task.categoryId);
+
+  // Expansion state
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Swipe handling
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -79,8 +93,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       // Swiped right -> complete
       toggleTaskComplete(task.id);
     } else if (swipeOffset < -70) {
-      // Swiped left -> open edit or delete
-      setSelectedTaskForEdit(task);
+      // Swiped left -> toggle expand task details
+      setIsExpanded(prev => !prev);
     }
     setSwipeOffset(0);
     setTouchStartX(null);
@@ -158,7 +172,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             toggleTaskComplete(task.id);
           }}
           aria-label={task.completed ? 'Mark task as incomplete' : 'Mark task as complete'}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-1 -mt-1 rounded-xl text-slate-400 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-transform active:scale-95"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-1 -mt-1 rounded-xl text-slate-400 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-transform active:scale-95 shrink-0"
         >
           <div
             className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
@@ -171,11 +185,21 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           </div>
         </button>
 
-        {/* Task Details - Tap to view & edit */}
+        {/* Task Details - Tap to expand / collapse */}
         <div 
-          onClick={() => setSelectedTaskForEdit(task)}
-          className="flex-1 min-w-0 cursor-pointer pt-0.5 select-none"
+          onClick={() => setIsExpanded(prev => !prev)}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isExpanded}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsExpanded(prev => !prev);
+            }
+          }}
+          className="flex-1 min-w-0 cursor-pointer pt-0.5 select-none focus:outline-none"
         >
+          {/* Header Row: Title, Priority, Recurrence */}
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h3
               className={`text-base font-semibold leading-snug break-words transition-colors ${
@@ -203,14 +227,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             )}
           </div>
 
-          {/* Description/Notes Preview */}
-          {task.notes && (
+          {/* Description/Notes Preview (only when collapsed) */}
+          {task.notes && !isExpanded && (
             <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">
               {task.notes}
             </p>
           )}
 
-          {/* Metadata Chips: Time, Category, Date, Subtasks */}
+          {/* Metadata Chips: Time, Category, Date, Subtasks Counter */}
           <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400 pt-0.5">
             {/* Category badge */}
             {category && (
@@ -251,6 +275,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               </span>
             )}
 
+            {/* Subtask count chip (summary on card) */}
+            {task.subtasks && task.subtasks.length > 0 && !isExpanded && (
+              <span className="inline-flex items-center gap-1 font-medium px-2 py-0.5 rounded-md text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <ListChecks className="w-3 h-3 text-brand-500" />
+                <span>{completedSubtasksCount}/{task.subtasks.length} subtasks</span>
+              </span>
+            )}
+
             {/* Reminder enabled icon */}
             {task.reminder?.enabled && (
               <span className="text-brand-500" title="Reminder Active">
@@ -267,164 +299,312 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             )}
           </div>
 
-          {/* Subtasks Section on Main Page */}
-          {((task.subtasks && task.subtasks.length > 0) || isAddingSubtask) && (
+          {/* Expanded Task Section */}
+          {isExpanded && (
             <div 
-              onClick={e => e.stopPropagation()} 
-              className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 cursor-default"
+              onClick={(e) => e.stopPropagation()} 
+              className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-3 cursor-default animate-fade-in"
             >
-              {/* Subtask Header & Progress */}
-              {task.subtasks && task.subtasks.length > 0 && (
-                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <ListChecks className="w-3.5 h-3.5 text-brand-500" />
-                    <span>Subtasks ({completedSubtasksCount}/{task.subtasks.length})</span>
+              {/* Full Notes / Description */}
+              {task.notes && (
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300">
+                  <div className="flex items-center gap-1.5 font-semibold text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                    <AlignLeft className="w-3.5 h-3.5 text-brand-500" />
+                    <span>Notes & Details</span>
                   </div>
-                  {/* Progress bar */}
-                  <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-500 transition-all duration-300"
-                      style={{ width: `${(completedSubtasksCount / task.subtasks.length) * 100}%` }}
-                    />
-                  </div>
+                  <p className="leading-relaxed whitespace-pre-wrap">{task.notes}</p>
                 </div>
               )}
 
-              {/* Subtask Items */}
-              {task.subtasks && task.subtasks.length > 0 && (
-                <div className="space-y-1">
-                  {(showAllSubtasks ? task.subtasks : task.subtasks.slice(0, 3)).map(st => (
-                    <div
-                      key={st.id}
-                      onClick={(e) => handleToggleSubtask(e, st.id)}
-                      className={`group/st flex items-center gap-2 px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                        st.completed
-                          ? 'text-slate-400 dark:text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/40'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
+              {/* Task Details Box (When Added, Completed, Due, Recurrence, Reminder, Location) */}
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-500 dark:text-slate-400">
+                {/* When Added */}
+                {task.createdAt && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-3.5 h-3.5 text-brand-500 shrink-0" />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Added:</strong>{' '}
+                      {formatAddedDate(task.createdAt)}
+                    </span>
+                  </div>
+                )}
+
+                {/* When Completed (if completed) */}
+                {task.completed && task.completedAt && (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Completed:</strong>{' '}
+                      {formatCompletedDate(task.completedAt)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Due Date & Time */}
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-brand-500 shrink-0" />
+                  <span className="truncate">
+                    <strong className="text-slate-700 dark:text-slate-300 font-medium">Due:</strong>{' '}
+                    {formatDateLabel(task.dueDate)}{task.dueTime ? ` at ${formatTimeDisplay(task.dueTime, settings.timeFormat === '12h')}` : ''}
+                  </span>
+                </div>
+
+                {/* Category */}
+                {category && (
+                  <div className="flex items-center gap-2">
+                    <IconRenderer name={category.icon} className="w-3.5 h-3.5 shrink-0" style={{ color: category.color }} />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Category:</strong>{' '}
+                      {category.name}
+                    </span>
+                  </div>
+                )}
+
+                {/* Reminder info */}
+                {task.reminder?.enabled && (
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Reminder:</strong>{' '}
+                      {task.reminder.time ? formatTimeDisplay(task.reminder.time, settings.timeFormat === '12h') : (task.dueTime ? formatTimeDisplay(task.dueTime, settings.timeFormat === '12h') : 'Enabled')}
+                    </span>
+                  </div>
+                )}
+
+                {/* Recurrence info */}
+                {task.recurrence && (
+                  <div className="flex items-center gap-2">
+                    <Repeat className="w-3.5 h-3.5 text-brand-500 shrink-0" />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Repeats:</strong>{' '}
+                      {task.recurrence.frequency.charAt(0).toUpperCase() + task.recurrence.frequency.slice(1)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Location */}
+                {task.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span className="truncate">
+                      <strong className="text-slate-700 dark:text-slate-300 font-medium">Location:</strong>{' '}
+                      {task.location}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Tags */}
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <TagIcon className="w-3 h-3 text-slate-400 shrink-0" />
+                  {task.tags.map((tag, idx) => (
+                    <span 
+                      key={idx}
+                      className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                     >
-                      <button
-                        type="button"
-                        onClick={(e) => handleToggleSubtask(e, st.id)}
-                        aria-label={st.completed ? `Mark subtask "${st.title}" incomplete` : `Mark subtask "${st.title}" complete`}
-                        className="text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shrink-0 p-0.5"
-                      >
-                        {st.completed ? (
-                          <CheckSquare className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/10" />
-                        ) : (
-                          <Square className="w-3.5 h-3.5 text-slate-400 group-hover/st:text-slate-600 dark:group-hover/st:text-slate-300" />
-                        )}
-                      </button>
-                      <span className={`text-xs break-words transition-colors ${st.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
-                        {st.title}
-                      </span>
-                    </div>
+                      #{tag}
+                    </span>
                   ))}
                 </div>
               )}
 
-              {/* Show more/less toggle button if > 3 subtasks */}
-              {task.subtasks && task.subtasks.length > 3 && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowAllSubtasks(prev => !prev);
-                  }}
-                  className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline px-2 py-0.5 flex items-center gap-1"
-                >
-                  {showAllSubtasks ? (
-                    <>
-                      <span>Show less</span>
-                      <ChevronUp className="w-3 h-3" />
-                    </>
-                  ) : (
-                    <>
-                      <span>+{task.subtasks.length - 3} more subtasks</span>
-                      <ChevronDown className="w-3 h-3" />
-                    </>
-                  )}
-                </button>
-              )}
-
-              {/* Add subtask inline on card */}
-              {isAddingSubtask ? (
-                <div className="pt-1 flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={cardSubtaskInput}
-                      onChange={e => setCardSubtaskInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddSubtaskOnCard(e);
-                        } else if (e.key === 'Escape') {
-                          e.preventDefault();
-                          setIsAddingSubtask(false);
-                          setCardSubtaskInput('');
-                        }
-                      }}
-                      autoFocus
-                      placeholder={isCardSubtaskListening ? '🎙️ Listening... speak subtask' : 'New subtask...'}
-                      className={`w-full bg-slate-50 dark:bg-slate-800 border rounded-lg pl-2.5 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-all ${
-                        isCardSubtaskListening
-                          ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/30'
-                          : 'border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-brand-500'
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={isCardSubtaskListening ? stopCardSubtaskVoice : startCardSubtaskVoice}
-                      title={isCardSubtaskListening ? 'Stop listening' : 'Voice input for subtask'}
-                      className={`absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center transition-all ${
-                        isCardSubtaskListening
-                          ? 'bg-rose-500 text-white animate-pulse'
-                          : 'text-slate-400 hover:text-brand-500'
-                      }`}
-                    >
-                      <Mic className={`w-3 h-3 ${isCardSubtaskListening ? 'animate-bounce' : ''}`} />
-                    </button>
+              {/* Subtasks Section on Main Page */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <ListChecks className="w-3.5 h-3.5 text-brand-500" />
+                    <span>Subtasks ({completedSubtasksCount}/{(task.subtasks || []).length})</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleAddSubtaskOnCard}
-                    disabled={!cardSubtaskInput.trim()}
-                    className="px-2.5 py-1.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
-                  >
-                    Add
-                  </button>
+                  {task.subtasks && task.subtasks.length > 0 && (
+                    <div className="w-20 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-emerald-500 transition-all duration-300"
+                        style={{ width: `${(completedSubtasksCount / task.subtasks.length) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Subtask Items */}
+                {task.subtasks && task.subtasks.length > 0 ? (
+                  <div className="space-y-1">
+                    {(showAllSubtasks ? task.subtasks : task.subtasks.slice(0, 3)).map(st => (
+                      <div
+                        key={st.id}
+                        onClick={(e) => handleToggleSubtask(e, st.id)}
+                        className={`group/st flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                          st.completed
+                            ? 'text-slate-400 dark:text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/40'
+                            : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleSubtask(e, st.id)}
+                          aria-label={st.completed ? `Mark subtask "${st.title}" incomplete` : `Mark subtask "${st.title}" complete`}
+                          className="text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors shrink-0 p-0.5"
+                        >
+                          {st.completed ? (
+                            <CheckSquare className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/10" />
+                          ) : (
+                            <Square className="w-3.5 h-3.5 text-slate-400 group-hover/st:text-slate-600 dark:group-hover/st:text-slate-300" />
+                          )}
+                        </button>
+                        <span className={`text-xs break-words transition-colors ${st.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
+                          {st.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 dark:text-slate-500 italic px-1">
+                    No subtasks yet
+                  </p>
+                )}
+
+                {/* Show more/less toggle button if > 3 subtasks */}
+                {task.subtasks && task.subtasks.length > 3 && (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsAddingSubtask(false);
-                      setCardSubtaskInput('');
+                      setShowAllSubtasks(prev => !prev);
                     }}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded"
+                    className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline px-2 py-0.5 flex items-center gap-1"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    {showAllSubtasks ? (
+                      <>
+                        <span>Show less</span>
+                        <ChevronUp className="w-3 h-3" />
+                      </>
+                    ) : (
+                      <>
+                        <span>+{task.subtasks.length - 3} more subtasks</span>
+                        <ChevronDown className="w-3 h-3" />
+                      </>
+                    )}
                   </button>
-                </div>
-              ) : (
+                )}
+
+                {/* Add subtask inline on card */}
+                {isAddingSubtask ? (
+                  <div className="pt-1 flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={cardSubtaskInput}
+                        onChange={e => setCardSubtaskInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddSubtaskOnCard(e);
+                          } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            setIsAddingSubtask(false);
+                            setCardSubtaskInput('');
+                          }
+                        }}
+                        autoFocus
+                        placeholder={isCardSubtaskListening ? '🎙️ Listening... speak subtask' : 'New subtask...'}
+                        className={`w-full bg-slate-50 dark:bg-slate-800 border rounded-lg pl-2.5 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-all ${
+                          isCardSubtaskListening
+                            ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/30'
+                            : 'border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-brand-500'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={isCardSubtaskListening ? stopCardSubtaskVoice : startCardSubtaskVoice}
+                        title={isCardSubtaskListening ? 'Stop listening' : 'Voice input for subtask'}
+                        className={`absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center transition-all ${
+                          isCardSubtaskListening
+                            ? 'bg-rose-500 text-white animate-pulse'
+                            : 'text-slate-400 hover:text-brand-500'
+                        }`}
+                      >
+                        <Mic className={`w-3 h-3 ${isCardSubtaskListening ? 'animate-bounce' : ''}`} />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddSubtaskOnCard}
+                      disabled={!cardSubtaskInput.trim()}
+                      className="px-2.5 py-1.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAddingSubtask(false);
+                        setCardSubtaskInput('');
+                      }}
+                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsAddingSubtask(true);
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2 py-0.5 transition-colors mt-0.5"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add subtask</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Expanded Footer Actions */}
+              <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setIsAddingSubtask(true);
+                    setSelectedTaskForEdit(task);
                   }}
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2 py-0.5 transition-colors mt-0.5"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/60 dark:hover:bg-brand-900/60 text-brand-600 dark:text-brand-400 text-xs font-semibold border border-brand-200/50 dark:border-brand-800/50 transition-colors"
                 >
-                  <Plus className="w-3 h-3" />
-                  <span>Add subtask</span>
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Task</span>
                 </button>
-              )}
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTask(task.id);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-medium transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsExpanded(false);
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-xs font-medium ml-auto transition-colors"
+                >
+                  <span>Collapse</span>
+                  <ChevronUp className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Action Buttons (Quick edit / Delete) */}
-        <div className="flex items-center opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        {/* Action Buttons (Quick edit / Delete / Expand) */}
+        <div className="flex items-center gap-0.5 shrink-0">
           <button
             type="button"
             onClick={(e) => {
@@ -432,7 +612,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               setSelectedTaskForEdit(task);
             }}
             aria-label="Edit task"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-brand-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Edit task"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-slate-400 hover:text-brand-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Edit3 className="w-4 h-4" />
           </button>
@@ -443,9 +624,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               deleteTask(task.id);
             }}
             aria-label="Delete task"
-            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+            title="Delete task"
+            className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(prev => !prev);
+            }}
+            aria-label={isExpanded ? 'Collapse task' : 'Expand task'}
+            title={isExpanded ? 'Collapse' : 'Expand'}
+            className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4 transition-transform" />
+            ) : (
+              <ChevronDown className="w-4 h-4 transition-transform" />
+            )}
           </button>
         </div>
       </div>
